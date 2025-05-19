@@ -138,7 +138,7 @@ AS $$
 DECLARE
     v_reservation_id INTEGER;
 BEGIN
-    -- Validar disponibilidad
+
     IF EXISTS (
         SELECT 1 FROM reservation
         WHERE room_id = p_room_id
@@ -150,16 +150,16 @@ BEGIN
             p_room_id, p_start_date, p_end_date;
     END IF;
 
-    -- Insertar reserva
+
     INSERT INTO reservation (guest_id, room_id, start_date, end_date, status)
     VALUES (p_guest_id, p_room_id, p_start_date, p_end_date, 'booked')
     RETURNING reservation_id INTO v_reservation_id;
 
-    -- Insertar pago
+
     INSERT INTO payment (reservation_id, paid_amount, paid_date, payment_method, receipt_number)
     VALUES (v_reservation_id, p_paid_amount, CURRENT_DATE, p_payment_method, p_receipt_number);
 
-    -- Actualizar estado de habitación
+
     UPDATE room SET status = 'occupied'
     WHERE room_id = p_room_id;
 
